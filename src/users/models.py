@@ -2,9 +2,10 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.core.database import Base, UUIDMixin, TimestampMixin
+from src.core.database import Base, TimestampMixin, UUIDMixin
 
 if TYPE_CHECKING:
+    from src.orders.models import Order
     from src.organizers.models import Organizer
 
 
@@ -19,3 +20,4 @@ class User(Base, UUIDMixin, TimestampMixin):
     organizer: Mapped["Organizer"] = relationship(
         back_populates="user", foreign_keys="Organizer.user_id"
     )
+    orders: Mapped[list["Order"]] = relationship(back_populates="user")

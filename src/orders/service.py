@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, status
 
@@ -15,7 +15,9 @@ class OrderService:
     async def create_order(self, data: OrderCreate, user: User) -> Order:
         ticket_type = await self.repository.get_ticket_type(str(data.ticket_type_id))
         if ticket_type is None or not ticket_type.is_active:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket turi topilmadi.")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Ticket turi topilmadi."
+            )
 
         available = (ticket_type.quantity_total or 0) - (ticket_type.quantity_sold or 0)
         if data.quantity > available:
@@ -28,7 +30,7 @@ class OrderService:
             quantity=data.quantity,
             unit_price=ticket_type.price,
             total_amount=ticket_type.price * data.quantity,
-            expires_at=datetime.now(timezone.utc) + timedelta(minutes=15),
+            expires_at=datetime.now(UTC) + timedelta(minutes=15),
         )
         return await self.repository.create_order(order)
 
