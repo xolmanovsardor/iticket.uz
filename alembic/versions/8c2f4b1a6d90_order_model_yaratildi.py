@@ -1,0 +1,40 @@
+"""Order model yaratildi
+
+Revision ID: 8c2f4b1a6d90
+Revises: 37db9b1dc2ff
+Create Date: 2026-08-22
+
+"""
+from typing import Sequence, Union
+
+from alembic import op
+import sqlalchemy as sa
+
+
+revision: str = "8c2f4b1a6d90"
+down_revision: Union[str, Sequence[str], None] = "37db9b1dc2ff"
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
+
+
+def upgrade() -> None:
+    op.create_table(
+        "orders",
+        sa.Column("user_id", sa.UUID(), nullable=False),
+        sa.Column("ticket_type_id", sa.UUID(), nullable=False),
+        sa.Column("quantity", sa.Integer(), nullable=False),
+        sa.Column("unit_price", sa.Float(), nullable=False),
+        sa.Column("total_amount", sa.Float(), nullable=False),
+        sa.Column("status", sa.String(), nullable=False),
+        sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False),
+        sa.Column("id", sa.UUID(), nullable=False),
+        sa.Column("created_at", sa.String(), server_default="now()", nullable=False),
+        sa.Column("updated_at", sa.String(), server_default="now()", nullable=False),
+        sa.ForeignKeyConstraint(["ticket_type_id"], ["ticket_types.id"], name=op.f("fk_orders_ticket_type_id_ticket_types")),
+        sa.ForeignKeyConstraint(["user_id"], ["users.id"], name=op.f("fk_orders_user_id_users")),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_orders")),
+    )
+
+
+def downgrade() -> None:
+    op.drop_table("orders")
